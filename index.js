@@ -226,7 +226,10 @@ const HOMES = [
     new Home(canvas.width - sizeOfHomes.width, 0, "red"),
     new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue"),
 ];
-HOMES.forEach((home) => home.draw());
+HOMES.forEach((home, index) => {
+    home.startingTile = staringTiles[index];
+    home.draw();
+});
 const heaven = new Heaven();
 heaven.draw();
 //#endregion
@@ -260,4 +263,3 @@ heaven.draw();
     }
 });
 //#endregion
-console.log(staringTiles);

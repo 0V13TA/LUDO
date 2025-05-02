@@ -329,7 +329,10 @@ const HOMES = [
     "blue"
   ),
 ];
-HOMES.forEach((home) => home.draw());
+HOMES.forEach((home, index) => {
+  home.startingTile = staringTiles[index];
+  home.draw();
+});
 const heaven = new Heaven();
 
 heaven.draw();
@@ -371,5 +374,3 @@ document.querySelector("button#roll")?.addEventListener("click", () => {
 });
 
 //#endregion
-
-console.log(staringTiles);
