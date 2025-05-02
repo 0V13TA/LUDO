@@ -30,6 +30,7 @@ const get2randInt = () => [
     Math.floor(Math.random() * 6 + 1),
 ];
 let isPlaying = false;
+let randNumbs = [1, 1];
 class Home {
     constructor(x, y, color) {
         this.x = x;
@@ -41,12 +42,28 @@ class Home {
         this.name = this.color === "green" && noOfPlayer === 3 ? "white" : color;
         this.discX = 50;
         this.discY = 60;
+        switch (this.color) {
+            case "green":
+                this.discColor = "#00ff00";
+                break;
+            case "blue":
+                this.discColor = "#11b9f1";
+                break;
+            case "yellow":
+                this.discColor = "#ffff00d5";
+                break;
+            case "red":
+                this.discColor = "#ff4800";
+            default:
+                this.discColor = this.color;
+                break;
+        }
         this.startingTile = null;
         this.discs = [
-            new Disc(this.x + this.discX, this.y + this.discY, this.color, this.color),
-            new Disc(this.x + this.width - this.discX, this.y + this.discY, this.color, this.color),
-            new Disc(this.x + this.discX, this.y + this.height - this.discY, this.color, this.color),
-            new Disc(this.x + this.width - this.discX, this.y + this.height - this.discY, this.color, this.color),
+            new Disc(this.x + this.discX, this.y + this.discY, this.discColor, this.color),
+            new Disc(this.x + this.width - this.discX, this.y + this.discY, this.discColor, this.color),
+            new Disc(this.x + this.discX, this.y + this.height - this.discY, this.discColor, this.color),
+            new Disc(this.x + this.width - this.discX, this.y + this.height - this.discY, this.discColor, this.color),
         ];
     }
     draw() {
@@ -91,6 +108,7 @@ class Tile {
         this.width = sizeOfTile.width;
         this.nextTile = nextTile;
         this.disc = null;
+        this.house = "white";
     }
     draw() {
         ctx.beginPath();
@@ -124,7 +142,7 @@ class Disc {
     }
     move(times) {
         if (times > 6 || times < 1)
-            throw new Error("Number Of Times must not be less than 1 and must not be greater than 6");
+            console.log("Number Of Times must not be less than 1 and must not be greater than 6");
         for (let i = 0; i < times; i++) {
             if (this.currentTile !== null) {
                 this.isOutOfHouse = true;
@@ -236,13 +254,16 @@ leftTiles.forEach((row, i) => {
                 staringTiles.blue = rightTiles[i][j];
             }
         }
+        tile.house = "green";
+        rightTiles[i][j].house = "blue";
+        topTiles[i][j].house = "red";
+        bottomTiles[i][j].house = "yellow";
         tile.draw();
         rightTiles[i][j].draw();
         topTiles[i][j].draw();
         bottomTiles[i][j].draw();
     });
 });
-// The Arrangement matters and should not be changed
 const HOMES = [
     new Home(0, 0, "green"),
     new Home(0, canvas.height - sizeOfHomes.height, "yellow"),
@@ -252,6 +273,25 @@ const HOMES = [
 HOMES.forEach((home) => home.draw());
 const heaven = new Heaven();
 heaven.draw();
+HOMES[0].discs[1].move(52);
+specialTiles.forEach((tile) => {
+    if (tile.disc !== null && tile.house === tile.disc.house) {
+        switch (tile.house) {
+            case "blue":
+                tile.nextTile = rightTiles[1][4];
+                break;
+            case "yellow":
+                tile.nextTile = bottomTiles[1][4];
+                break;
+            case "red":
+                tile.nextTile = topTiles[1][4];
+                break;
+            default:
+                tile.nextTile = leftTiles[1][1];
+                break;
+        }
+    }
+});
 //#endregion
 //#region EventListners
 (_a = document.querySelector("button#roll")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
