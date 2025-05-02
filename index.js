@@ -110,7 +110,7 @@ class Disc {
         this.color = color;
         this.house = house;
         this.isOutOfHouse = false;
-        this.startingTile = staringTiles[house];
+        this.currentTile = staringTiles[house];
         this.radius = sizeOfTile.height / 2 - 2;
     }
     draw() {
@@ -121,6 +121,20 @@ class Disc {
         ctx.stroke();
         ctx.fill();
         ctx.closePath();
+    }
+    move(times) {
+        if (times > 6 || times < 1)
+            throw new Error("Number Of Times must not be less than 1 and must not be greater than 6");
+        for (let i = 0; i < times; i++) {
+            if (this.currentTile !== null) {
+                this.isOutOfHouse = true;
+                this.currentTile.disc = this;
+                this.x = this.currentTile.x + this.radius;
+                this.y = this.currentTile.y + this.radius;
+                this.currentTile = this.currentTile.nextTile;
+                this.draw();
+            }
+        }
     }
 }
 //#endregion

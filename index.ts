@@ -190,7 +190,7 @@ interface Disc {
   radius: number;
   color: string;
   house: colors;
-  startingTile: Tile | null;
+  currentTile: Tile | null;
   isOutOfHouse: boolean;
   draw(): void;
 }
@@ -201,7 +201,7 @@ class Disc {
     this.color = color;
     this.house = house;
     this.isOutOfHouse = false;
-    this.startingTile = staringTiles[house];
+    this.currentTile = staringTiles[house];
     this.radius = sizeOfTile.height / 2 - 2;
   }
 
@@ -213,6 +213,23 @@ class Disc {
     ctx.stroke();
     ctx.fill();
     ctx.closePath();
+  }
+
+  move(times: number) {
+    if (times > 6 || times < 1)
+      throw new Error(
+        "Number Of Times must not be less than 1 and must not be greater than 6"
+      );
+    for (let i = 0; i < times; i++) {
+      if (this.currentTile !== null) {
+        this.isOutOfHouse = true;
+        this.currentTile.disc = this;
+        this.x = this.currentTile.x + this.radius;
+        this.y = this.currentTile.y + this.radius;
+        this.currentTile = this.currentTile.nextTile;
+        this.draw();
+      }
+    }
   }
 }
 
