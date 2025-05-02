@@ -1,4 +1,14 @@
-//#region Variables and Functions
+//#region Variables, Functions and Type Definitions
+
+type startingTiles = {
+  green: Tile | null;
+  yellow: Tile | null;
+  red: Tile | null;
+  blue: Tile | null;
+  white: null;
+};
+
+type colors = "green" | "red" | "yellow" | "blue" | "white";
 
 const canvas = document.createElement("canvas");
 const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
@@ -18,7 +28,14 @@ const rightTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const topTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const bottomTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const specialTiles: Tile[] = [];
-const staringTiles: Tile[] = [];
+
+const staringTiles: startingTiles = {
+  green: null,
+  yellow: null,
+  red: null,
+  blue: null,
+  white: null,
+};
 let noOfPlayer = 4;
 
 const get2randInt = (): [number, number] => [
@@ -34,7 +51,7 @@ let isPlaying = false;
 interface Home {
   x: number;
   y: number;
-  color: string;
+  color: colors;
   width: number;
   height: number;
   border: number;
@@ -46,14 +63,14 @@ interface Home {
   draw(): void;
 }
 class Home {
-  constructor(x: number, y: number, color: string) {
+  constructor(x: number, y: number, color: colors) {
     this.x = x;
     this.y = y;
     this.color = color;
     this.width = sizeOfHomes.width;
     this.height = sizeOfHomes.height;
     this.border = 20;
-    this.name = this.color === "green" && noOfPlayer === 3 ? "none" : color;
+    this.name = this.color === "green" && noOfPlayer === 3 ? "white" : color;
     this.discX = 50;
     this.discY = 60;
     this.startingTile = null;
@@ -137,7 +154,7 @@ class Heaven {
 interface Tile {
   x: number;
   y: number;
-  color: string;
+  color: colors;
   width: number;
   height: number;
   nextTile: Tile | null;
@@ -145,7 +162,7 @@ interface Tile {
   draw(): void;
 }
 class Tile {
-  constructor(x: number, y: number, color: string, nextTile: Tile | null) {
+  constructor(x: number, y: number, color: colors, nextTile: Tile | null) {
     this.x = x;
     this.y = y;
     this.color = color;
@@ -172,17 +189,19 @@ interface Disc {
   y: number;
   radius: number;
   color: string;
-  house: string;
+  house: colors;
+  startingTile: Tile | null;
   isOutOfHouse: boolean;
   draw(): void;
 }
 class Disc {
-  constructor(x: number, y: number, color: string, house: string) {
+  constructor(x: number, y: number, color: string, house: colors) {
     this.x = x;
     this.y = y;
     this.color = color;
     this.house = house;
     this.isOutOfHouse = false;
+    this.startingTile = staringTiles[house];
     this.radius = sizeOfTile.height / 2 - 2;
   }
 
@@ -279,8 +298,8 @@ leftTiles.forEach((row, i) => {
           j === 0 ? leftTiles[2][5] : bottomTiles[i][j - 1];
       }
 
-      if (j === 1) staringTiles.push(tile);
-      if (j === 4) staringTiles.push(bottomTiles[i][j]);
+      if (j === 1) staringTiles.green = tile;
+      if (j === 4) staringTiles.yellow = bottomTiles[i][j];
     }
 
     if (i === 1) {
@@ -308,7 +327,10 @@ leftTiles.forEach((row, i) => {
         bottomTiles[i][j].nextTile = bottomTiles[i][j + 1];
       }
 
-      if (j === 4) staringTiles.push(topTiles[i][j], rightTiles[i][j]);
+      if (j === 4) {
+        staringTiles.red = topTiles[i][j];
+        staringTiles.blue = rightTiles[i][j];
+      }
     }
 
     tile.draw();
@@ -329,10 +351,7 @@ const HOMES = [
     "blue"
   ),
 ];
-HOMES.forEach((home, index) => {
-  home.startingTile = staringTiles[index];
-  home.draw();
-});
+HOMES.forEach((home) => home.draw());
 const heaven = new Heaven();
 
 heaven.draw();

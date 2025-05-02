@@ -1,5 +1,5 @@
 "use strict";
-//#region Variables and Functions
+//#region Variables, Functions and Type Definitions
 var _a;
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
@@ -17,7 +17,13 @@ const rightTiles = [[], [], []];
 const topTiles = [[], [], []];
 const bottomTiles = [[], [], []];
 const specialTiles = [];
-const staringTiles = [];
+const staringTiles = {
+    green: null,
+    yellow: null,
+    red: null,
+    blue: null,
+    white: null,
+};
 let noOfPlayer = 4;
 const get2randInt = () => [
     Math.floor(Math.random() * 6 + 1),
@@ -32,7 +38,7 @@ class Home {
         this.width = sizeOfHomes.width;
         this.height = sizeOfHomes.height;
         this.border = 20;
-        this.name = this.color === "green" && noOfPlayer === 3 ? "none" : color;
+        this.name = this.color === "green" && noOfPlayer === 3 ? "white" : color;
         this.discX = 50;
         this.discY = 60;
         this.startingTile = null;
@@ -104,6 +110,7 @@ class Disc {
         this.color = color;
         this.house = house;
         this.isOutOfHouse = false;
+        this.startingTile = staringTiles[house];
         this.radius = sizeOfTile.height / 2 - 2;
     }
     draw() {
@@ -181,9 +188,9 @@ leftTiles.forEach((row, i) => {
                     j === 0 ? leftTiles[2][5] : bottomTiles[i][j - 1];
             }
             if (j === 1)
-                staringTiles.push(tile);
+                staringTiles.green = tile;
             if (j === 4)
-                staringTiles.push(bottomTiles[i][j]);
+                staringTiles.yellow = bottomTiles[i][j];
         }
         if (i === 1) {
             leftTiles[i][0].nextTile = leftTiles[0][0];
@@ -210,8 +217,10 @@ leftTiles.forEach((row, i) => {
                 rightTiles[i][j].nextTile = rightTiles[i][j - 1];
                 bottomTiles[i][j].nextTile = bottomTiles[i][j + 1];
             }
-            if (j === 4)
-                staringTiles.push(topTiles[i][j], rightTiles[i][j]);
+            if (j === 4) {
+                staringTiles.red = topTiles[i][j];
+                staringTiles.blue = rightTiles[i][j];
+            }
         }
         tile.draw();
         rightTiles[i][j].draw();
@@ -226,10 +235,7 @@ const HOMES = [
     new Home(canvas.width - sizeOfHomes.width, 0, "red"),
     new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue"),
 ];
-HOMES.forEach((home, index) => {
-    home.startingTile = staringTiles[index];
-    home.draw();
-});
+HOMES.forEach((home) => home.draw());
 const heaven = new Heaven();
 heaven.draw();
 //#endregion
