@@ -246,6 +246,29 @@ class Disc {
       if (this.currentTile !== null) {
         this.isOutOfHouse = true;
         this.currentTile.disc = this;
+
+        if (specialTiles.includes(this.currentTile)) {
+          if (
+            this.currentTile.disc !== null &&
+            this.currentTile.house === this.house
+          ) {
+            switch (this.house) {
+              case "blue":
+                this.currentTile.nextTile = rightTiles[1][4];
+                break;
+              case "yellow":
+                this.currentTile.nextTile = bottomTiles[1][4];
+                break;
+              case "red":
+                this.currentTile.nextTile = topTiles[1][4];
+                break;
+              case "green":
+                this.currentTile.nextTile = leftTiles[1][1];
+                break;
+            }
+          }
+        }
+
         this.x = this.currentTile.x + this.radius;
         this.y = this.currentTile.y + this.radius;
         this.currentTile = this.currentTile.nextTile;
