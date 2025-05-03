@@ -1,4 +1,4 @@
-//#region Variables, Functions and Type Definitions
+//#region Variables and Type Definitions
 
 type startingTiles = {
   green: Tile | null;
@@ -28,6 +28,8 @@ const rightTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const topTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const bottomTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const specialTiles: Tile[] = [];
+const lastTiles: Tile[] = [];
+let animation = null;
 
 const staringTiles: startingTiles = {
   green: null,
@@ -38,10 +40,6 @@ const staringTiles: startingTiles = {
 };
 let noOfPlayer = 4;
 
-const get2randInt = (): [number, number] => [
-  Math.floor(Math.random() * 6 + 1),
-  Math.floor(Math.random() * 6 + 1),
-];
 let isPlaying = false;
 let randNumbs: [number, number] = [1, 1];
 
@@ -273,9 +271,8 @@ class Disc {
       );
     }
 
-    this.decideNextTileForSpecialTiles();
-
     for (let i = 0; i < times; i++) {
+      this.decideNextTileForSpecialTiles();
       if (this.currentTile !== null) {
         this.x = this.currentTile.x + this.radius;
         this.y = this.currentTile.y + this.radius;
@@ -289,140 +286,8 @@ class Disc {
 //#endregion
 
 //#region Initializations
-
-for (let i = 0; i < 3; i++) {
-  let xCoord = 0,
-    yCoord = sizeOfHomes.height;
-  let xCoord1 = sizeOfHomes.width + 3 * sizeOfTile.width,
-    yCoord1 = sizeOfHomes.height;
-  for (let j = 0; j < 6; j++) {
-    leftTiles[i].push(
-      new Tile(xCoord, yCoord + i * sizeOfTile.height, "white", null)
-    );
-    rightTiles[i].push(
-      new Tile(xCoord1, yCoord1 + i * sizeOfTile.height, "white", null)
-    );
-    xCoord += sizeOfTile.width;
-    xCoord1 += sizeOfTile.width;
-  }
-}
-
-for (let i = 0; i < 3; i++) {
-  let xCoord = sizeOfHomes.width,
-    yCoord = sizeOfHomes.height - sizeOfTile.height;
-  let xCoord1 = sizeOfHomes.width,
-    yCoord1 = sizeOfHomes.height + 3 * sizeOfTile.height;
-  for (let j = 0; j < 6; j++) {
-    topTiles[i].push(
-      new Tile(xCoord + i * sizeOfTile.width, yCoord, "white", null)
-    );
-    bottomTiles[i].push(
-      new Tile(xCoord1 + i * sizeOfTile.width, yCoord1, "white", null)
-    );
-    yCoord -= sizeOfTile.height;
-    yCoord1 += sizeOfTile.height;
-  }
-}
-
-leftTiles.forEach((row, i) => {
-  row.forEach((tile, j) => {
-    if (j === 4 || j === 1) {
-      if (j === 1 && i === 0) tile.color = "green";
-      if (j === 4 && i === 0) bottomTiles[i][j].color = "yellow";
-      if (i === 2 && j === 4) {
-        rightTiles[i][j].color = "blue";
-        topTiles[i][j].color = "red";
-      }
-    }
-
-    if (i === 1) {
-      tile.color = "green";
-      rightTiles[i][j].color = "blue";
-      topTiles[i][j].color = "red";
-      bottomTiles[i][j].color = "yellow";
-
-      tile.nextTile = leftTiles[i][j + 1];
-      rightTiles[i][j].nextTile = rightTiles[i][j - 1];
-      topTiles[i][j].nextTile = topTiles[i][j - 1];
-      bottomTiles[i][j].nextTile = bottomTiles[i][j - 1];
-
-      if (j === 0) {
-        tile.color = "white";
-        specialTiles.push(tile);
-      }
-
-      if (j === 5) {
-        rightTiles[i][j].color = "white";
-        topTiles[i][j].color = "white";
-        bottomTiles[i][j].color = "white";
-        specialTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
-        tile.nextTile = null;
-        rightTiles[i][j].nextTile = null;
-        topTiles[i][j].nextTile = null;
-        bottomTiles[i][j].nextTile = null;
-      }
-    }
-
-    if (i === 0) {
-      if (j === 5) {
-        tile.nextTile = topTiles[i][0];
-        topTiles[i][j].nextTile = topTiles[1][j];
-        rightTiles[i][j].nextTile = rightTiles[1][j];
-        bottomTiles[i][j].nextTile = bottomTiles[i][j - 1];
-      } else {
-        tile.nextTile = leftTiles[i][j + 1];
-        topTiles[i][j].nextTile = topTiles[i][j + 1];
-        rightTiles[i][j].nextTile = rightTiles[i][j + 1];
-        bottomTiles[i][j].nextTile =
-          j === 0 ? leftTiles[2][5] : bottomTiles[i][j - 1];
-      }
-
-      if (j === 1) staringTiles.green = tile;
-      if (j === 4) staringTiles.yellow = bottomTiles[i][j];
-    }
-
-    if (i === 1) {
-      leftTiles[i][0].nextTile = leftTiles[0][0];
-      topTiles[i][5].nextTile = topTiles[2][5];
-      rightTiles[i][5].nextTile = rightTiles[2][5];
-      bottomTiles[i][5].nextTile = bottomTiles[0][5];
-    }
-
-    if (i === 2) {
-      if (j === 0) {
-        tile.nextTile = leftTiles[1][0];
-        topTiles[i][j].nextTile = rightTiles[0][0];
-        rightTiles[i][j].nextTile = bottomTiles[2][0];
-        bottomTiles[i][j].nextTile = bottomTiles[i][j + 1];
-      } else if (j === 5) {
-        tile.nextTile = leftTiles[i][j - 1];
-        topTiles[i][j].nextTile = topTiles[i][j - 1];
-        rightTiles[i][j].nextTile = rightTiles[i][j - 1];
-        bottomTiles[i][j].nextTile = bottomTiles[1][5];
-      } else {
-        tile.nextTile = leftTiles[i][j - 1];
-        topTiles[i][j].nextTile = topTiles[i][j - 1];
-        rightTiles[i][j].nextTile = rightTiles[i][j - 1];
-        bottomTiles[i][j].nextTile = bottomTiles[i][j + 1];
-      }
-
-      if (j === 4) {
-        staringTiles.red = topTiles[i][j];
-        staringTiles.blue = rightTiles[i][j];
-      }
-    }
-
-    tile.house = "green";
-    rightTiles[i][j].house = "blue";
-    topTiles[i][j].house = "red";
-    bottomTiles[i][j].house = "yellow";
-
-    tile.draw();
-    rightTiles[i][j].draw();
-    topTiles[i][j].draw();
-    bottomTiles[i][j].draw();
-  });
-});
+generateTiles();
+drawTiles();
 
 const HOMES = [
   new Home(0, 0, "green"),
@@ -438,26 +303,6 @@ HOMES.forEach((home) => home.draw());
 const heaven = new Heaven();
 
 heaven.draw();
-
-HOMES[1].discs[1].move(56);
-specialTiles.forEach((tile) => {
-  if (tile.disc !== null && tile.house === tile.disc.house) {
-    switch (tile.house) {
-      case "blue":
-        tile.nextTile = rightTiles[1][4];
-        break;
-      case "yellow":
-        tile.nextTile = bottomTiles[1][4];
-        break;
-      case "red":
-        tile.nextTile = topTiles[1][4];
-        break;
-      default:
-        tile.nextTile = leftTiles[1][1];
-        break;
-    }
-  }
-});
 
 //#endregion
 
@@ -496,3 +341,160 @@ document.querySelector("button#roll")?.addEventListener("click", () => {
 });
 
 //#endregion
+
+//#region Functions
+
+function get2randInt(): [number, number] {
+  return [Math.floor(Math.random() * 6 + 1), Math.floor(Math.random() * 6 + 1)];
+}
+
+function generateTiles() {
+  for (let i = 0; i < 3; i++) {
+    let xCoord = 0,
+      yCoord = sizeOfHomes.height;
+    let xCoord1 = sizeOfHomes.width + 3 * sizeOfTile.width,
+      yCoord1 = sizeOfHomes.height;
+    for (let j = 0; j < 6; j++) {
+      leftTiles[i].push(
+        new Tile(xCoord, yCoord + i * sizeOfTile.height, "white", null)
+      );
+      rightTiles[i].push(
+        new Tile(xCoord1, yCoord1 + i * sizeOfTile.height, "white", null)
+      );
+      xCoord += sizeOfTile.width;
+      xCoord1 += sizeOfTile.width;
+    }
+  }
+
+  for (let i = 0; i < 3; i++) {
+    let xCoord = sizeOfHomes.width,
+      yCoord = sizeOfHomes.height - sizeOfTile.height;
+    let xCoord1 = sizeOfHomes.width,
+      yCoord1 = sizeOfHomes.height + 3 * sizeOfTile.height;
+    for (let j = 0; j < 6; j++) {
+      topTiles[i].push(
+        new Tile(xCoord + i * sizeOfTile.width, yCoord, "white", null)
+      );
+      bottomTiles[i].push(
+        new Tile(xCoord1 + i * sizeOfTile.width, yCoord1, "white", null)
+      );
+      yCoord -= sizeOfTile.height;
+      yCoord1 += sizeOfTile.height;
+    }
+  }
+}
+
+function drawTiles() {
+  leftTiles.forEach((row, i) => {
+    row.forEach((tile, j) => {
+      if (j === 4 || j === 1) {
+        if (j === 1 && i === 0) tile.color = "green";
+        if (j === 4 && i === 0) bottomTiles[i][j].color = "yellow";
+        if (i === 2 && j === 4) {
+          rightTiles[i][j].color = "blue";
+          topTiles[i][j].color = "red";
+        }
+      }
+
+      if (i === 1) {
+        tile.color = "green";
+        rightTiles[i][j].color = "blue";
+        topTiles[i][j].color = "red";
+        bottomTiles[i][j].color = "yellow";
+
+        tile.nextTile = leftTiles[i][j + 1];
+        rightTiles[i][j].nextTile = rightTiles[i][j - 1];
+        topTiles[i][j].nextTile = topTiles[i][j - 1];
+        bottomTiles[i][j].nextTile = bottomTiles[i][j - 1];
+
+        if (j === 0) {
+          tile.color = "white";
+          specialTiles.push(tile);
+          lastTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
+        }
+
+        if (j === 5) {
+          rightTiles[i][j].color = "white";
+          topTiles[i][j].color = "white";
+          bottomTiles[i][j].color = "white";
+          specialTiles.push(
+            rightTiles[i][j],
+            topTiles[i][j],
+            bottomTiles[i][j]
+          );
+          tile.nextTile = null;
+          rightTiles[i][j].nextTile = null;
+          topTiles[i][j].nextTile = null;
+          bottomTiles[i][j].nextTile = null;
+          lastTiles.push(tile);
+        }
+      }
+
+      if (i === 0) {
+        if (j === 5) {
+          tile.nextTile = topTiles[i][0];
+          topTiles[i][j].nextTile = topTiles[1][j];
+          rightTiles[i][j].nextTile = rightTiles[1][j];
+          bottomTiles[i][j].nextTile = bottomTiles[i][j - 1];
+        } else {
+          tile.nextTile = leftTiles[i][j + 1];
+          topTiles[i][j].nextTile = topTiles[i][j + 1];
+          rightTiles[i][j].nextTile = rightTiles[i][j + 1];
+          bottomTiles[i][j].nextTile =
+            j === 0 ? leftTiles[2][5] : bottomTiles[i][j - 1];
+        }
+
+        if (j === 1) staringTiles.green = tile;
+        if (j === 4) staringTiles.yellow = bottomTiles[i][j];
+      }
+
+      if (i === 1) {
+        leftTiles[i][0].nextTile = leftTiles[0][0];
+        topTiles[i][5].nextTile = topTiles[2][5];
+        rightTiles[i][5].nextTile = rightTiles[2][5];
+        bottomTiles[i][5].nextTile = bottomTiles[0][5];
+      }
+
+      if (i === 2) {
+        if (j === 0) {
+          tile.nextTile = leftTiles[1][0];
+          topTiles[i][j].nextTile = rightTiles[0][0];
+          rightTiles[i][j].nextTile = bottomTiles[2][0];
+          bottomTiles[i][j].nextTile = bottomTiles[i][j + 1];
+        } else if (j === 5) {
+          tile.nextTile = leftTiles[i][j - 1];
+          topTiles[i][j].nextTile = topTiles[i][j - 1];
+          rightTiles[i][j].nextTile = rightTiles[i][j - 1];
+          bottomTiles[i][j].nextTile = bottomTiles[1][5];
+        } else {
+          tile.nextTile = leftTiles[i][j - 1];
+          topTiles[i][j].nextTile = topTiles[i][j - 1];
+          rightTiles[i][j].nextTile = rightTiles[i][j - 1];
+          bottomTiles[i][j].nextTile = bottomTiles[i][j + 1];
+        }
+
+        if (j === 4) {
+          staringTiles.red = topTiles[i][j];
+          staringTiles.blue = rightTiles[i][j];
+        }
+      }
+
+      tile.house = "green";
+      rightTiles[i][j].house = "blue";
+      topTiles[i][j].house = "red";
+      bottomTiles[i][j].house = "yellow";
+
+      tile.draw();
+      rightTiles[i][j].draw();
+      topTiles[i][j].draw();
+      bottomTiles[i][j].draw();
+    });
+  });
+}
+
+//#endregion
+animation = setInterval(() => {
+  HOMES[0].discs[0].move(1);
+  drawTiles();
+  HOMES[0].discs[0].draw();
+}, 500);
