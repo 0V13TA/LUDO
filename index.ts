@@ -87,6 +87,7 @@ class Home {
         break;
       case "red":
         this.discColor = "#ff4800";
+        break;
 
       default:
         this.discColor = this.color;
@@ -236,39 +237,46 @@ class Disc {
     ctx.closePath();
   }
 
+  private decideNextTileForSpecialTiles() {
+    if (this.currentTile !== null) {
+      this.isOutOfHouse = true;
+      this.currentTile.disc = this;
+
+      if (specialTiles.includes(this.currentTile)) {
+        if (
+          this.currentTile.disc !== null &&
+          this.currentTile.house === this.house
+        ) {
+          switch (this.house) {
+            case "blue":
+              this.currentTile.nextTile = rightTiles[1][4];
+              break;
+            case "yellow":
+              this.currentTile.nextTile = bottomTiles[1][4];
+              break;
+            case "red":
+              this.currentTile.nextTile = topTiles[1][4];
+              break;
+            case "green":
+              this.currentTile.nextTile = leftTiles[1][1];
+              break;
+          }
+        }
+      }
+    }
+  }
+
   move(times: number) {
-    if (times > 6 || times < 1)
+    if (times > 6 || times < 1) {
       console.log(
         "Number Of Times must not be less than 1 and must not be greater than 6"
       );
+    }
+
+    this.decideNextTileForSpecialTiles();
 
     for (let i = 0; i < times; i++) {
       if (this.currentTile !== null) {
-        this.isOutOfHouse = true;
-        this.currentTile.disc = this;
-
-        if (specialTiles.includes(this.currentTile)) {
-          if (
-            this.currentTile.disc !== null &&
-            this.currentTile.house === this.house
-          ) {
-            switch (this.house) {
-              case "blue":
-                this.currentTile.nextTile = rightTiles[1][4];
-                break;
-              case "yellow":
-                this.currentTile.nextTile = bottomTiles[1][4];
-                break;
-              case "red":
-                this.currentTile.nextTile = topTiles[1][4];
-                break;
-              case "green":
-                this.currentTile.nextTile = leftTiles[1][1];
-                break;
-            }
-          }
-        }
-
         this.x = this.currentTile.x + this.radius;
         this.y = this.currentTile.y + this.radius;
         this.currentTile = this.currentTile.nextTile;
@@ -333,6 +341,11 @@ leftTiles.forEach((row, i) => {
       topTiles[i][j].color = "red";
       bottomTiles[i][j].color = "yellow";
 
+      tile.nextTile = leftTiles[i][j + 1];
+      rightTiles[i][j].nextTile = rightTiles[i][j - 1];
+      topTiles[i][j].nextTile = topTiles[i][j - 1];
+      bottomTiles[i][j].nextTile = bottomTiles[i][j - 1];
+
       if (j === 0) {
         tile.color = "white";
         specialTiles.push(tile);
@@ -343,6 +356,10 @@ leftTiles.forEach((row, i) => {
         topTiles[i][j].color = "white";
         bottomTiles[i][j].color = "white";
         specialTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
+        tile.nextTile = null;
+        rightTiles[i][j].nextTile = null;
+        topTiles[i][j].nextTile = null;
+        bottomTiles[i][j].nextTile = null;
       }
     }
 
@@ -422,7 +439,7 @@ const heaven = new Heaven();
 
 heaven.draw();
 
-HOMES[0].discs[1].move(52);
+HOMES[1].discs[1].move(56);
 specialTiles.forEach((tile) => {
   if (tile.disc !== null && tile.house === tile.disc.house) {
     switch (tile.house) {

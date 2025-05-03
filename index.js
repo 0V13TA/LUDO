@@ -213,6 +213,10 @@ leftTiles.forEach((row, i) => {
             rightTiles[i][j].color = "blue";
             topTiles[i][j].color = "red";
             bottomTiles[i][j].color = "yellow";
+            tile.nextTile = leftTiles[i][j + 1];
+            rightTiles[i][j].nextTile = rightTiles[i][j - 1];
+            topTiles[i][j].nextTile = topTiles[i][j - 1];
+            bottomTiles[i][j].nextTile = bottomTiles[i][j - 1];
             if (j === 0) {
                 tile.color = "white";
                 specialTiles.push(tile);
@@ -222,6 +226,10 @@ leftTiles.forEach((row, i) => {
                 topTiles[i][j].color = "white";
                 bottomTiles[i][j].color = "white";
                 specialTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
+                tile.nextTile = null;
+                rightTiles[i][j].nextTile = null;
+                topTiles[i][j].nextTile = null;
+                bottomTiles[i][j].nextTile = null;
             }
         }
         if (i === 0) {
@@ -292,7 +300,7 @@ const HOMES = [
 HOMES.forEach((home) => home.draw());
 const heaven = new Heaven();
 heaven.draw();
-HOMES[0].discs[1].move(52);
+HOMES[1].discs[1].move(56);
 specialTiles.forEach((tile) => {
     if (tile.disc !== null && tile.house === tile.disc.house) {
         switch (tile.house) {
