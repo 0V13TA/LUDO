@@ -28,7 +28,6 @@ const rightTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const topTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const bottomTiles: [Tile[], Tile[], Tile[]] = [[], [], []];
 const specialTiles: Tile[] = [];
-const lastTiles: Tile[] = [];
 let animation = null;
 
 const staringTiles: startingTiles = {
@@ -410,7 +409,6 @@ function drawTiles() {
           rightTiles[i][j].nextTile = null;
           topTiles[i][j].nextTile = null;
           bottomTiles[i][j].nextTile = null;
-          lastTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
         }
 
         if (j === 5) {
@@ -426,7 +424,6 @@ function drawTiles() {
           );
           // Setting the last tile of the left tile to null
           tile.nextTile = null;
-          lastTiles.push(tile);
         }
       }
 

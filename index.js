@@ -17,7 +17,6 @@ const rightTiles = [[], [], []];
 const topTiles = [[], [], []];
 const bottomTiles = [[], [], []];
 const specialTiles = [];
-const lastTiles = [];
 let animation = null;
 const staringTiles = {
     green: null,
@@ -275,7 +274,6 @@ function drawTiles() {
                     rightTiles[i][j].nextTile = null;
                     topTiles[i][j].nextTile = null;
                     bottomTiles[i][j].nextTile = null;
-                    lastTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
                 }
                 if (j === 5) {
                     // Setting the special tiles to white
@@ -285,7 +283,6 @@ function drawTiles() {
                     specialTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
                     // Setting the last tile of the left tile to null
                     tile.nextTile = null;
-                    lastTiles.push(tile);
                 }
             }
             if (i === 0) {
