@@ -173,6 +173,36 @@ class Disc {
             this.draw();
         }
     }
+    check(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        // Check if the click is within the disc's boundaries
+        if (clickX >= this.x - this.radius &&
+            clickX <= this.x + this.radius &&
+            clickY >= this.y - this.radius &&
+            clickY <= this.y + this.radius) {
+            // Move the disc based on the dice roll
+            for (let i = 0; i < randNumbs[0]; i++) {
+                this.move();
+            }
+            // Redraw the game board after the disc has moved
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            drawTiles(); // Redraw all tiles
+            homes.forEach((home) => home.draw()); // Redraw all homes
+            // Reset the dice values
+            randNumbs = [0, 0];
+            // Debugging output
+            console.table([
+                {
+                    clientX: clickX,
+                    clientY: clickY,
+                    discX: this.x,
+                    discY: this.y,
+                },
+            ]);
+        }
+    }
 }
 //#endregion
 //#region Initializations
@@ -238,8 +268,18 @@ heaven.draw();
             (_b = document
                 .querySelector(`ul.secondDie li#id${rand1}`)) === null || _b === void 0 ? void 0 : _b.classList.add("selected");
         }, 500);
-        randNumbs.push(rand, rand1);
+        randNumbs = [rand, rand1];
     }
+});
+addEventListener("click", (e) => {
+    homes.forEach((home) => {
+        home.discs.forEach((disc) => {
+            disc.check(e);
+            drawTiles();
+            drawTiles();
+            homes.forEach((home) => home.draw());
+        });
+    });
 });
 //#endregion
 //#region Functions
@@ -375,6 +415,5 @@ function drawTiles() {
 }
 //#endregion
 animation = setInterval(() => {
-    drawTiles();
     homes.forEach((home) => home.draw());
 }, 500);

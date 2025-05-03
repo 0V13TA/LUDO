@@ -213,6 +213,7 @@ interface Disc {
   currentTile: Tile | null;
   isOutOfHouse: boolean;
   draw(): void;
+  check(e: MouseEvent): void;
 }
 class Disc {
   constructor(x: number, y: number, color: string, house: colors) {
@@ -271,6 +272,43 @@ class Disc {
       this.y = this.currentTile.y + sizeOfTile.height / 2;
       this.currentTile = this.currentTile.nextTile;
       this.draw();
+    }
+  }
+
+  check(e: MouseEvent) {
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    // Check if the click is within the disc's boundaries
+    if (
+      clickX >= this.x - this.radius &&
+      clickX <= this.x + this.radius &&
+      clickY >= this.y - this.radius &&
+      clickY <= this.y + this.radius
+    ) {
+      // Move the disc based on the dice roll
+      for (let i = 0; i < randNumbs[0]; i++) {
+        this.move();
+      }
+
+      // Redraw the game board after the disc has moved
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+      drawTiles(); // Redraw all tiles
+      homes.forEach((home) => home.draw()); // Redraw all homes
+
+      // Reset the dice values
+      randNumbs = [0, 0];
+
+      // Debugging output
+      console.table([
+        {
+          clientX: clickX,
+          clientY: clickY,
+          discX: this.x,
+          discY: this.y,
+        },
+      ]);
     }
   }
 }
@@ -367,8 +405,19 @@ document.querySelector("button#roll")?.addEventListener("click", () => {
         .querySelector(`ul.secondDie li#id${rand1}`)
         ?.classList.add("selected");
     }, 500);
-    randNumbs.push(rand, rand1);
+    randNumbs = [rand, rand1];
   }
+});
+
+addEventListener("click", (e) => {
+  homes.forEach((home) => {
+    home.discs.forEach((disc) => {
+      disc.check(e);
+      drawTiles();
+      drawTiles();
+      homes.forEach((home) => home.draw());
+    });
+  });
 });
 
 //#endregion
@@ -534,6 +583,5 @@ function drawTiles() {
 //#endregion
 
 animation = setInterval(() => {
-  drawTiles();
   homes.forEach((home) => home.draw());
 }, 500);
