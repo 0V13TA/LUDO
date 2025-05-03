@@ -28,15 +28,16 @@ const staringTiles = {
 let noOfPlayer = 4;
 let isPlaying = false;
 let randNumbs = [0, 0];
+let numberOfPlayers = 4;
 class Home {
-    constructor(x, y, color) {
+    constructor(x, y, color, name = color) {
         this.x = x;
         this.y = y;
         this.color = color;
         this.width = sizeOfHomes.width;
         this.height = sizeOfHomes.height;
         this.border = 20;
-        this.name = this.color === "green" && noOfPlayer === 3 ? "white" : color;
+        this.name = name;
         this.discX = 50;
         this.discY = 60;
         switch (this.color) {
@@ -178,13 +179,36 @@ class Disc {
 // This code should come before you initialize the homes.
 generateTiles();
 drawTiles();
-const HOMES = [
-    new Home(0, 0, "green"),
-    new Home(0, canvas.height - sizeOfHomes.height, "yellow"),
-    new Home(canvas.width - sizeOfHomes.width, 0, "red"),
-    new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue"),
-];
-HOMES.forEach((home) => home.draw());
+let homes = [];
+switch (numberOfPlayers) {
+    case 4:
+        homes = [
+            new Home(0, 0, "green"),
+            new Home(0, canvas.height - sizeOfHomes.height, "yellow"),
+            new Home(canvas.width - sizeOfHomes.width, 0, "red"),
+            new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue"),
+        ];
+        break;
+    case 3:
+        homes = [
+            new Home(0, 0, "green", "white"),
+            new Home(0, canvas.height - sizeOfHomes.height, "yellow"),
+            new Home(canvas.width - sizeOfHomes.width, 0, "red"),
+            new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue"),
+        ];
+        break;
+    case 2:
+        homes = [
+            new Home(0, 0, "green", "green"),
+            new Home(0, canvas.height - sizeOfHomes.height, "yellow", "blue"),
+            new Home(canvas.width - sizeOfHomes.width, 0, "red", "green"),
+            new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue", "blue"),
+        ];
+        break;
+    default:
+        throw new Error("Number of players cannot be less than 2");
+}
+homes.forEach((home) => home.draw());
 const heaven = new Heaven();
 heaven.draw();
 //#endregion
@@ -352,6 +376,5 @@ function drawTiles() {
 //#endregion
 animation = setInterval(() => {
     drawTiles();
-    HOMES[3].discs[0].move();
-    HOMES[3].discs[0].draw();
+    homes.forEach((home) => home.draw());
 }, 500);
