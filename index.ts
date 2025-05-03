@@ -41,7 +41,7 @@ const staringTiles: startingTiles = {
 let noOfPlayer = 4;
 
 let isPlaying = false;
-let randNumbs: [number, number] = [1, 1];
+let randNumbs: [number, number] = [0, 0];
 
 //#endregion
 
@@ -78,13 +78,13 @@ class Home {
         this.discColor = "#00ff00";
         break;
       case "blue":
-        this.discColor = "#11b9f1";
+        this.discColor = "#0050ff";
         break;
       case "yellow":
-        this.discColor = "#ffff00d5";
+        this.discColor = "#ffff00";
         break;
       case "red":
-        this.discColor = "#ff4800";
+        this.discColor = "#ff0000";
         break;
 
       default:
@@ -222,7 +222,7 @@ class Disc {
     this.house = house;
     this.isOutOfHouse = false;
     this.currentTile = staringTiles[house];
-    this.radius = sizeOfTile.height / 2 - 2;
+    this.radius = sizeOfTile.height / 2 - 4;
   }
 
   draw() {
@@ -264,21 +264,13 @@ class Disc {
     }
   }
 
-  move(times: number) {
-    if (times > 6 || times < 1) {
-      console.log(
-        "Number Of Times must not be less than 1 and must not be greater than 6"
-      );
-    }
-
-    for (let i = 0; i < times; i++) {
-      this.decideNextTileForSpecialTiles();
-      if (this.currentTile !== null) {
-        this.x = this.currentTile.x + this.radius;
-        this.y = this.currentTile.y + this.radius;
-        this.currentTile = this.currentTile.nextTile;
-        this.draw();
-      }
+  move() {
+    this.decideNextTileForSpecialTiles();
+    if (this.currentTile !== null) {
+      this.x = this.currentTile.x + sizeOfTile.width / 2;
+      this.y = this.currentTile.y + sizeOfTile.height / 2;
+      this.currentTile = this.currentTile.nextTile;
+      this.draw();
     }
   }
 }
@@ -286,6 +278,8 @@ class Disc {
 //#endregion
 
 //#region Initializations
+
+// This code should come before you initialize the homes.
 generateTiles();
 drawTiles();
 
@@ -336,7 +330,7 @@ document.querySelector("button#roll")?.addEventListener("click", () => {
         .querySelector(`ul.secondDie li#id${rand1}`)
         ?.classList.add("selected");
     }, 500);
-    console.log(rand, rand1);
+    randNumbs.push(rand, rand1);
   }
 });
 
@@ -408,30 +402,38 @@ function drawTiles() {
         bottomTiles[i][j].nextTile = bottomTiles[i][j - 1];
 
         if (j === 0) {
+          // Setting the special tiles to white
           tile.color = "white";
+
           specialTiles.push(tile);
+          // Setting the last tiles to null
+          rightTiles[i][j].nextTile = null;
+          topTiles[i][j].nextTile = null;
+          bottomTiles[i][j].nextTile = null;
           lastTiles.push(rightTiles[i][j], topTiles[i][j], bottomTiles[i][j]);
         }
 
         if (j === 5) {
+          // Setting the special tiles to white
           rightTiles[i][j].color = "white";
           topTiles[i][j].color = "white";
           bottomTiles[i][j].color = "white";
+
           specialTiles.push(
             rightTiles[i][j],
             topTiles[i][j],
             bottomTiles[i][j]
           );
+          // Setting the last tile of the left tile to null
           tile.nextTile = null;
-          rightTiles[i][j].nextTile = null;
-          topTiles[i][j].nextTile = null;
-          bottomTiles[i][j].nextTile = null;
           lastTiles.push(tile);
         }
       }
 
       if (i === 0) {
         if (j === 5) {
+          // Setting the next tiles of the last tiles of a column
+          // So the disc can move correctly.
           tile.nextTile = topTiles[i][0];
           topTiles[i][j].nextTile = topTiles[1][j];
           rightTiles[i][j].nextTile = rightTiles[1][j];
@@ -449,6 +451,8 @@ function drawTiles() {
       }
 
       if (i === 1) {
+        // Setting the next tile special tiles of
+        // each house to the correct tile
         leftTiles[i][0].nextTile = leftTiles[0][0];
         topTiles[i][5].nextTile = topTiles[2][5];
         rightTiles[i][5].nextTile = rightTiles[2][5];
@@ -493,8 +497,9 @@ function drawTiles() {
 }
 
 //#endregion
+
 animation = setInterval(() => {
-  HOMES[0].discs[0].move(1);
   drawTiles();
-  HOMES[0].discs[0].draw();
+  HOMES[3].discs[0].move();
+  HOMES[3].discs[0].draw();
 }, 500);
