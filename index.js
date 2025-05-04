@@ -26,9 +26,12 @@ const staringTiles = {
     white: null,
 };
 let noOfPlayer = 4;
+const currentPlayerSpan = document.querySelector("span#currentPlayer");
 let isPlaying = false;
 let randNumbs = [0, 0];
 let numberOfPlayers = 4;
+let players = [];
+let currentPlayer = null;
 class Home {
     constructor(x, y, color, name = color) {
         this.x = x;
@@ -173,7 +176,7 @@ class Disc {
             this.draw();
         }
     }
-    check(e) {
+    updateGameState(e) {
         const rect = canvas.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const clickY = e.clientY - rect.top;
@@ -181,7 +184,8 @@ class Disc {
         if (clickX >= this.x - this.radius &&
             clickX <= this.x + this.radius &&
             clickY >= this.y - this.radius &&
-            clickY <= this.y + this.radius) {
+            clickY <= this.y + this.radius &&
+            currentPlayer === this.house) {
             // Move the disc based on the dice roll
             for (let i = 0; i < randNumbs[0]; i++) {
                 this.move();
@@ -192,15 +196,9 @@ class Disc {
             homes.forEach((home) => home.draw()); // Redraw all homes
             // Reset the dice values
             randNumbs = [0, 0];
-            // Debugging output
-            console.table([
-                {
-                    clientX: clickX,
-                    clientY: clickY,
-                    discX: this.x,
-                    discY: this.y,
-                },
-            ]);
+            currentPlayer =
+                players[(players.indexOf(currentPlayer) + 1) % players.length];
+            currentPlayerSpan.textContent = currentPlayer;
         }
     }
 }
@@ -218,6 +216,9 @@ switch (numberOfPlayers) {
             new Home(canvas.width - sizeOfHomes.width, 0, "red"),
             new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue"),
         ];
+        players = ["green", "yellow", "red", "blue"];
+        currentPlayer = players[0];
+        currentPlayerSpan.textContent = currentPlayer;
         break;
     case 3:
         homes = [
@@ -226,6 +227,9 @@ switch (numberOfPlayers) {
             new Home(canvas.width - sizeOfHomes.width, 0, "red"),
             new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue"),
         ];
+        players = ["yellow", "red", "blue"];
+        currentPlayer = players[0];
+        currentPlayerSpan.textContent = currentPlayer;
         break;
     case 2:
         homes = [
@@ -234,6 +238,9 @@ switch (numberOfPlayers) {
             new Home(canvas.width - sizeOfHomes.width, 0, "red", "green"),
             new Home(canvas.width - sizeOfHomes.width, canvas.height - sizeOfHomes.height, "blue", "blue"),
         ];
+        players = ["green", "blue"];
+        currentPlayer = players[0];
+        currentPlayerSpan.textContent = currentPlayer;
         break;
     default:
         throw new Error("Number of players cannot be less than 2");
@@ -274,7 +281,7 @@ heaven.draw();
 addEventListener("click", (e) => {
     homes.forEach((home) => {
         home.discs.forEach((disc) => {
-            disc.check(e);
+            disc.updateGameState(e);
             drawTiles();
             drawTiles();
             homes.forEach((home) => home.draw());

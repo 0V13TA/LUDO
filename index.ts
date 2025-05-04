@@ -39,9 +39,13 @@ const staringTiles: startingTiles = {
 };
 let noOfPlayer = 4;
 
+const currentPlayerSpan = document.querySelector("span#currentPlayer");
+
 let isPlaying = false;
 let randNumbs: [number, number] = [0, 0];
 let numberOfPlayers = 4;
+let players: colors[] = [];
+let currentPlayer: colors | null = null;
 
 //#endregion
 
@@ -213,7 +217,7 @@ interface Disc {
   currentTile: Tile | null;
   isOutOfHouse: boolean;
   draw(): void;
-  check(e: MouseEvent): void;
+  updateGameState(e: MouseEvent): void;
 }
 class Disc {
   constructor(x: number, y: number, color: string, house: colors) {
@@ -275,7 +279,7 @@ class Disc {
     }
   }
 
-  check(e: MouseEvent) {
+  updateGameState(e: MouseEvent) {
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
@@ -285,7 +289,8 @@ class Disc {
       clickX >= this.x - this.radius &&
       clickX <= this.x + this.radius &&
       clickY >= this.y - this.radius &&
-      clickY <= this.y + this.radius
+      clickY <= this.y + this.radius &&
+      currentPlayer === this.house
     ) {
       // Move the disc based on the dice roll
       for (let i = 0; i < randNumbs[0]; i++) {
@@ -300,15 +305,9 @@ class Disc {
       // Reset the dice values
       randNumbs = [0, 0];
 
-      // Debugging output
-      console.table([
-        {
-          clientX: clickX,
-          clientY: clickY,
-          discX: this.x,
-          discY: this.y,
-        },
-      ]);
+      currentPlayer =
+        players[(players.indexOf(currentPlayer) + 1) % players.length];
+      currentPlayerSpan!.textContent = currentPlayer;
     }
   }
 }
@@ -335,6 +334,9 @@ switch (numberOfPlayers) {
         "blue"
       ),
     ];
+    players = ["green", "yellow", "red", "blue"];
+    currentPlayer = players[0];
+    currentPlayerSpan!.textContent = currentPlayer;
     break;
 
   case 3:
@@ -348,6 +350,9 @@ switch (numberOfPlayers) {
         "blue"
       ),
     ];
+    players = ["yellow", "red", "blue"];
+    currentPlayer = players[0];
+    currentPlayerSpan!.textContent = currentPlayer;
     break;
 
   case 2:
@@ -362,6 +367,9 @@ switch (numberOfPlayers) {
         "blue"
       ),
     ];
+    players = ["green", "blue"];
+    currentPlayer = players[0];
+    currentPlayerSpan!.textContent = currentPlayer;
     break;
 
   default:
@@ -412,7 +420,7 @@ document.querySelector("button#roll")?.addEventListener("click", () => {
 addEventListener("click", (e) => {
   homes.forEach((home) => {
     home.discs.forEach((disc) => {
-      disc.check(e);
+      disc.updateGameState(e);
       drawTiles();
       drawTiles();
       homes.forEach((home) => home.draw());
